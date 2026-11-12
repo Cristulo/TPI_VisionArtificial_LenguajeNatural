@@ -1,280 +1,213 @@
-\documentclass[10pt,a4paper,twocolumn]{article}
+\documentclass[11pt,a4paper]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[margin=1.8cm,top=2.0cm,bottom=2.2cm]{geometry}
+\usepackage{lmodern}
+\usepackage[margin=2.2cm,top=2.2cm,bottom=2.2cm]{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
-\usepackage{lmodern}
 \usepackage{hyperref}
 \usepackage{caption}
-\usepackage{subcaption}
 \usepackage{fancyhdr}
-\usepackage{xcolor}
-\usepackage{titlesec}
 \usepackage{float}
+\usepackage{parskip}
 
 \renewcommand{\tablename}{Tabla}
 \renewcommand{\figurename}{Figura}
-\renewcommand{\abstractname}{Resumen}
-\renewcommand{\refname}{Referencias}
 
 \hypersetup{
     colorlinks=true,
-    linkcolor=blue!70!black,
-    citecolor=blue!70!black,
-    urlcolor=blue!70!black
+    linkcolor=black,
+    urlcolor=blue
 }
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small\textbf{Visión Artificial y Lenguaje Natural (Ciclo 2026)}}
-\fancyhead[R]{\small\textbf{TPI - Retinografía Vascular Digital}}
+\fancyhead[L]{\small Visión Artificial y Lenguaje Natural (2026)}
+\fancyhead[R]{\small Trabajo Práctico Integrador -- Retinografía}
 \fancyfoot[C]{\thepage}
-
-\titleformat{\section}{\large\bfseries\color{blue!80!black}}{\thesection.}{0.5em}{}[\titlerule]
-\titleformat{\subsection}{\normalsize\bfseries\color{black!90}}{\thesubsection.}{0.4em}{}
-
-\title{
-    \vspace{-1.2cm}
-    \textbf{\Large Trabajo Práctico Integrador: Visión Artificial}\\[0.25cm]
-    \large \textbf{Segmentación y Metrología Morfológica de Retinografía Vascular Digital}\\[0.2cm]
-    \normalsize Caso Seleccionado: Img 3 -- Retinografía Vascular Digital (Fondo de Ojo)
-}
-
-\author{
-    \textbf{Bringas, Mateo Lautaro} (Legajo: 435719) \and
-    \textbf{Castro, Cristian Leonel} (Legajo: 435837) \and
-    \textbf{Garcia Pintos, Valentin} (Legajo: 435804)
-}
-
-\date{
-    \small
-    \textbf{Carrera:} Licenciatura en Inteligencia Artificial\\
-    \textbf{Cátedra:} 2026-1IA1(1) Visión Artificial y Lenguaje Natural\\
-    \textbf{Plataforma:} Campus Virtual Moodle \quad | \quad Ciclo Lectivo 2026
-}
 
 \begin{document}
 
-\maketitle
-\thispagestyle{fancy}
+% ==========================================
+% 1. CARÁTULA Y DATOS INSTITUCIONALES
+% ==========================================
+\thispagestyle{empty}
+\begin{center}
+    \vspace*{1.0cm}
+    {\Large \textbf{Licenciatura en Inteligencia Artificial}}\\[0.3cm]
+    {\large \textbf{Materia:} 2026-1IA1(1) Visión Artificial y Lenguaje Natural}\\[1.5cm]
+    
+    \rule{\linewidth}{0.5mm} \\[0.4cm]
+    {\LARGE \textbf{Trabajo Práctico Integrador: Visión Artificial}}\\[0.3cm]
+    {\Large Pipeline de Procesamiento y Metrología en Retinografía Vascular Digital}\\[0.2cm]
+    \rule{\linewidth}{0.5mm} \\[1.5cm]
 
-\begin{abstract}
-\noindent El análisis automático de imágenes biomédicas de fondo de ojo constituye una herramienta diagnóstica fundamental para la detección temprana de retinopatía diabética, hipertensión y glaucoma. En este trabajo se diseña, implementa y audita un pipeline integral de visión artificial clásica en 5 etapas canónicas aplicado al caso clínico de retinografía vascular (\texttt{Img 3}). Se aborda el aislamiento espectral en el canal verde ($G$), la reducción de ruido térmico mediante filtrado de mediana ($3\times 3$), la ecualización adaptativa local por CLAHE para compensar la iluminación no uniforme, la binarización global mediante el algoritmo de Otsu sobre el mapa de contraste vascular invertido, y el desacople topológico mediante operaciones morfológicas y transformada de \textit{Watershed}. Finalmente, se extraen descriptores cuantitativos (área, perímetro, centroide y factor de circularidad) sobre los componentes conexos no truncados, exportando los resultados métricos oficiales y evaluando los compromisos entre sobre-segmentación y sub-segmentación.
-\end{abstract}
+    \begin{minipage}{0.85\textwidth}
+        \textbf{Caso Seleccionado:} Img 3 -- Retinografía Vascular Digital (Recurso: \texttt{Retina / 3.png})\\[0.4cm]
+        \textbf{Herramienta Utilizada:} Fiji / ImageJ (Interfaz Gráfica No-Code)\\[0.6cm]
+        \textbf{Integrantes del Grupo:}
+        \begin{itemize}
+            \item \textbf{Bringas, Mateo Lautaro} -- Legajo: 435719 -- \texttt{435719@tecnologia.edu.ar}
+            \item \textbf{Castro, Cristian Leonel} -- Legajo: 435837 -- \texttt{435837@tecnologia.edu.ar}
+            \item \textbf{Garcia Pintos, Valentin} -- Legajo: 435804 -- \texttt{435804@tecnologia.edu.ar}
+        \end{itemize}
+    \end{minipage}
 
-\vspace{0.2cm}
+    \vfill
+    {\large Ciclo Lectivo 2026}
+\end{center}
 
-\section{Carátula y Datos Institucionales}
+\newpage
+\setcounter{page}{2}
 
-\noindent \textbf{Institución:} Universidad / Facultad de Tecnología e Informática.\\
-\textbf{Carrera:} Licenciatura en Inteligencia Artificial.\\
-\textbf{Materia:} 2026-1IA1(1) Visión Artificial y Lenguaje Natural.\\
-\textbf{Documento:} Informe Técnico Grupal (Entregable A).\\
-\textbf{Caso de Estudio:} Caso 3 -- Retinografía Vascular Digital (\texttt{3.png}, resolución $1024 \times 680$ píxeles).\\
-\textbf{Integrantes del Equipo de Trabajo:}
-\begin{itemize}
-    \setlength\itemsep{0em}
-    \item Bringas, Mateo Lautaro --- Legajo: 435719
-    \item Castro, Cristian Leonel --- Legajo: 435837
-    \item Garcia Pintos, Valentin --- Legajo: 435804
-\end{itemize}
-
+% ==========================================
+% 2. DIAGNÓSTICO FOTOMÉTRICO Y DE ADQUISICIÓN
+% ==========================================
 \section{Diagnóstico Fotométrico y de Adquisición}
 
-\subsection{Inspección Espectral y Aislamiento del Canal Verde}
-La adquisición digital de fondo de ojo mediante oftalmoscopía genera imágenes cromáticas RGB caracterizadas por una reflectancia tisular heterogénea. La hemoglobina (tanto oxigenada como desoxigenada) presenta su máximo coeficiente de absorción óptica en longitudes de onda intermedias ($\lambda \approx 540\text{--}575\text{ nm}$), correspondientes al espectro de emisión del canal verde ($G$). 
+Para comenzar el trabajo en Fiji/ImageJ, abrimos la imagen \texttt{3.png} ($1024 \times 680$ píxeles). Al tratarse de una imagen a color (RGB) de fondo de ojo, el primer paso antes de pasar a 8 bits fue evaluar los canales por separado mediante \texttt{Image > Color > Split Channels}. 
 
-Como se demuestra cuantitativamente en la Figura~\ref{fig:diagnostico}(a-d):
-\begin{enumerate}
-    \item \textbf{Canal Rojo ($R$):} Exhibe saturación lumínica severa con niveles de gris concentrados en el rango $[180, 255]$. El parénquima retiniano y los vasos presentan reflectancias indistinguibles, anulando el contraste local de bordes.
-    \item \textbf{Canal Azul ($B$):} Sufre dispersión fotométrica Rayleigh y fuerte absorción corneal/cristalina, produciendo una señal subexpuesta (niveles mayoritariamente en $[0, 50]$) con muy baja relación señal-a-ruido (SNR).
-    \item \textbf{Canal Verde ($G$):} Ofrece el rango dinámico óptimo, donde los vasos sanguíneos aparecen como estructuras oscuras de alta absorción sobre el fondo anaranjado-rojizo de la coroides y el epitelio pigmentario.
-\end{enumerate}
-
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=0.98\textwidth]{figuras/fig1_diagnostico_histograma.png}
-    \caption{Diagnóstico fotométrico y espectral del caso de estudio (\texttt{3.png}): (a) Imagen original RGB; (b) Aislamiento del canal verde ($G$); (c) Conversión estándar a escala de grises de 8-bit; (d) Histogramas comparativos de los canales espectrales en la región de interés (FOV); (e) Histograma del canal verde con parámetros estadísticos; (f) Perfil transversal de intensidad $Y=340$ evidenciando el gradiente esférico de iluminación.}
-    \label{fig:diagnostico}
-\end{figure*}
-
-\subsection{Análisis del Histograma y Rango Dinámico}
-Para evitar que el borde exterior negro de la cámara retiniana contamine el diagnóstico analítico, se generó una máscara del campo de visión retiniano (\textit{Field of View}, FOV), abarcando un área tisular efectiva de $A_{\text{FOV}} = 311\,605\text{ px}^2$.
-
-El histograma del canal verde sobre el FOV (Figura~\ref{fig:diagnostico}(e)) presenta una media de $\mu = 53.4$ niveles de intensidad con una desviación estándar de $\sigma = 26.3$, extendiéndose el $90\%$ central de los píxeles entre los percentiles $P_5 = 19$ y $P_{95} = 94$. Se observan tres características fotométricas determinantes:
-\begin{itemize}
-    \item \textbf{Distribución Unimodal Asimétrica:} La dominancia del parénquima retiniano eclipsa a la red vascular en el histograma global, impidiendo que un método de umbralización directa diferencie ambos picos sin acondicionamiento previo.
-    \item \textbf{Compresión Dinámica en Sombras:} La señal útil ocupa menos del $40\%$ del rango disponible en 8 bits ($[0, 255]$).
-    \item \textbf{Gradiente Radial de Iluminación (Viñeteado):} Como ilustra el perfil de intensidades en la Figura~\ref{fig:diagnostico}(f), el centro de la retina recibe mayor densidad lumínica focalizada, mientras que los cuadrantes periféricos experimentan una caída de intensidad de hasta el $60\%$.
-\end{itemize}
-
-\subsection{Tipología de Ruido Identificado}
-La imagen presenta ruido aditivo de alta frecuencia atribuible a la corriente oscura y ruido térmico del sensor CMOS/CCD bajo iluminación atenuada. Dicho ruido se manifiesta como perturbaciones estocásticas de intensidad gaussiana acopladas a fluctuaciones locales en las paredes de microvasos, requiriendo un filtrado espacial no lineal que atenúe la varianza sin disipar la continuidad de bordes delgados.
-
-\section{Diagrama de Flujo del Pipeline}
+Observamos que el canal Rojo está muy saturado (los vasos casi no se distinguen del tejido) y el canal Azul es demasiado oscuro y ruidoso. En cambio, el \textbf{Canal Verde (G)} muestra el mejor contraste porque la sangre absorbe mucha luz en esa longitud de onda, haciendo que las venas y arterias se vean bien oscuras respecto al fondo de la retina. Por eso nos quedamos con el canal verde como imagen monocromática de 8 bits (valores discretos en $[0, 255]$).
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\columnwidth]{figuras/fig2_flujograma_pipeline.png}
-    \caption{Esquema en bloques de las 5 etapas del pipeline de procesamiento implementado con parámetros exactos.}
-    \label{fig:pipeline}
+    \includegraphics[width=0.92\textwidth]{figuras/fig1_diagnostico_histograma.png}
+    \caption{Separación de canales, imagen en 8 bits y análisis del histograma de niveles de gris sobre la retina.}
+    \label{fig:diagnostico}
 \end{figure}
 
-\noindent La secuencia analítica diseñada para resolver los desafíos diagnosticados se estructura en las 5 etapas canónicas detalladas en el cuadro de parámetros técnicos (Tabla~\ref{tab:parametros}).
+\textbf{Interpretación del Histograma y Rango Dinámico:}
+\begin{itemize}
+    \item \textbf{Distribución:} Si miramos toda la imagen completa, el histograma parecería bimodal por el recuadro negro que rodea al ojo. Pero analizando únicamente el círculo de la retina (\textit{Field of View} de $311\,605\text{ px}^2$), la distribución es \textbf{unimodal asimétrica}, con una media de $53.4$ y desvío estándar de $26.3$.
+    \item \textbf{Exposición y Rango Dinámico:} El rango dinámico está \textbf{comprimido hacia las sombras y tonos medios} (el $90\%$ de los píxeles de la retina cae entre los niveles $19$ y $94$). Además, se nota un fuerte gradiente de iluminación esférico (viñeteado): el centro y la zona del disco óptico están mucho más iluminados que los bordes periféricos.
+    \item \textbf{Tipología de Ruido:} No se observan píxeles blancos o negros aislados extremos, por lo que descartamos ruido impulsivo (\textit{Sal y Pimienta}). El ruido presente es de tipo \textbf{Gaussiano / térmico de sensor}, propio de la cámara en zonas de baja iluminación, que se percibe como una textura granulada suave sobre el fondo del tejido.
+\end{itemize}
+
+% ==========================================
+% 3. DIAGRAMA DE FLUJO DEL PIPELINE
+% ==========================================
+\section{Diagrama de Flujo del Pipeline}
+
+A continuación se presenta el esquema en bloques de las 5 etapas ejecutadas y la tabla con las herramientas y parámetros exactos utilizados en Fiji/ImageJ:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figuras/fig2_flujograma_pipeline.png}
+    \caption{Secuencia de bloques de las 5 etapas aplicadas en el pipeline de procesamiento.}
+    \label{fig:flujo}
+\end{figure}
 
 \begin{table}[H]
 \centering
 \footnotesize
-\caption{Parámetros y herramientas por etapa del pipeline.}
-\label{tab:parametros}
-\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lll@{}}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llll@{}}
 \toprule
-\textbf{Etapa} & \textbf{Herramienta / Operación} & \textbf{Parámetros Exactos} \\ \midrule
-1. Ingesta & Extracción Canal Verde & Split Channels ($G$), 8-bit \\
-2. Preproceso & Filtro de Mediana & Kernel $3 \times 3$ ($r=1.5\text{ px}$) \\
-              & CLAHE Local & Clip=2.5, Grid $8 \times 8$ \\
-              & Sustracción Fondo & Rolling Ball / Dilatación $31\text{ px}$ \\
-3. Segmenta & Umbral de Otsu & $T = 42.0$, Dark Background \\
-4. Morfología & Apertura Binaria & Elemento disco ($r=1\text{ px}$) \\
-              & Cierre y Relleno Huecos & Elemento disco ($r=2\text{ px}$) \\
-              & Filtro de Área Mínima & $A \ge 20\text{ px}^2$ \\
-              & Desacople Watershed & Distancia Euclídea, $d_{\text{min}}=8$ \\
-5. Metrología & Analyze Particles (CCA) & Conectividad 8, Exclude Edges \\
-              & Métricas Exportadas & Área, Perímetro, Circularidad \\ \bottomrule
+\textbf{Etapa} & \textbf{Operación} & \textbf{Ruta en Fiji / ImageJ} & \textbf{Parámetros Exactos} \\ \midrule
+1. Ingesta & Canal Verde 8-bit & \texttt{Image > Color > Split Channels} & Selección canal G ($[0, 255]$) \\
+           & Histograma & \texttt{Analyze > Histogram} & 256 bins (Región FOV) \\
+2. Preproceso & Filtro Espacial & \texttt{Process > Filters > Median...} & Radio $= 1.5\text{ px}$ (Kernel $3\times 3$) \\
+              & Realce Local & \texttt{Process > Enhance Local Contrast} & Block=63, Bins=256, Slope=2.5 \\
+              & Sustracción Fondo & \texttt{Process > Subtract Background} & Rolling ball $= 30\text{ px}$ \\
+3. Segmentación & Umbralización & \texttt{Image > Adjust > Threshold} & \textbf{Otsu} ($T = 42$), \textit{Dark bg} \\
+4. Morfología & Apertura Binaria & \texttt{Process > Binary > Open} & Disco $r=1\text{ px}$ ($3\times 3$) \\
+              & Cierre y Relleno & \texttt{Process > Binary > Close / Fill Holes} & Sella huecos internos ($r=2$) \\
+              & División de Aguas & \texttt{Process > Binary > Watershed} & Mapa distancia euclídea \\
+5. Metrología & Set Measurements & \texttt{Analyze > Set Measurements} & Area, Centroid, Perim., Circ. \\
+              & Conteo y Medición & \texttt{Analyze > Analyze Particles} & Size: \texttt{20-Inf}, \textit{Exclude edges} \\ \bottomrule
 \end{tabular*}
+\caption{Detalle de menús y parámetros configurados en cada etapa.}
 \end{table}
 
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=0.98\textwidth]{figuras/fig3_memoria_grafica_etapas.png}
-    \caption{Memoria gráfica de transformación secuencial: (a) Original RGB; (b) Canal Verde preprocesado con Filtro de Mediana ($3\times3$) y realce adaptativo CLAHE; (c) Binarización de Otsu con Dark Background ($T=42.0$); (d) Acondicionamiento morfológico (apertura para eliminar espículas y cierre/relleno del lumen vascular); (e) Desacople de cruces vasculares mediante líneas de división de aguas (\textit{Watershed}); (f) Extracción metrológica final con contornos numerados de los componentes conectados válidos.}
-    \label{fig:memoria_grafica}
-\end{figure*}
-
+% ==========================================
+% 4. JUSTIFICACIÓN TEÓRICA Y ANALÍTICA
+% ==========================================
 \section{Justificación Teórica y Analítica}
 
-\subsection{Filtrado Espacial: Mediana vs. Gaussiano}
-El filtrado lineal gaussiano convoluciona la señal con una máscara ponderada simétrica:
-\begin{equation}
-    G(x,y) = \frac{1}{2\pi\sigma^2} \exp\left(-\frac{x^2+y^2}{2\sigma^2}\right)
-\end{equation}
-Si bien este operador es eficaz para suprimir ruido normal, presenta la desventaja de promediar las transiciones bruscas de intensidad. En vasos retinianos de calibre fino (1 a 3 píxeles de ancho), un desenfoque gaussiano degrada el gradiente transversal del borde, fundiendo el vaso con el fondo y provocando su desaparición durante la binarización posterior. 
-
-Por el contrario, el filtro espacial de \textbf{Mediana} ($3 \times 3$) reemplaza cada píxel por la mediana estadística de su vecindario:
-\begin{equation}
-    I_{\text{med}}(x,y) = \text{mediana}\left(\{I(x+i, y+j) \mid (i,j) \in W\}\right)
-\end{equation}
-Al no ser un promedio aritmético, la mediana posee una respuesta de borde de pendiente infinita, eliminando píxeles espurios sin atenuar la energía de las estructuras filiformes delgadas (Figura~\ref{fig:filtros}).
+\textbf{1. Filtro de Mediana ($3\times 3$) vs. Filtro Gaussiano o de Media:}
+Probamos inicialmente un filtro Gaussiano, pero al ser un filtro lineal de promedio ponderado, difumina los bordes de las venas más finitas (capilares de 1 a 3 píxeles de grosor), haciendo que se pierdan al binarizar. En cambio, el \textbf{Filtro de Mediana} con ventana de $3\times 3$ (radio $1.5\text{ px}$) es un filtro no lineal de orden que suaviza la granulosidad del ruido térmico pero preserva los bordes nítidos (\textit{edge-preserving}). Elegimos un kernel pequeño de $3\times 3$ porque una ventana mayor ($5\times 5$ o $7\times 7$) borraría las ramificaciones vasculares más delgadas.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\columnwidth]{figuras/fig4_comparativa_filtros_clahe.png}
-    \caption{Comparación de filtrado espacial: (a) Original; (b) Gaussiano (pérdida de borde); (c) Mediana (borde nítido); (d) CLAHE (visibilización de capilares).}
+    \includegraphics[width=0.95\textwidth]{figuras/fig4_comparativa_filtros_clahe.png}
+    \caption{Comparación visual: el filtro de Mediana conserva los vasos finos y CLAHE levanta el contraste en zonas oscuras.}
     \label{fig:filtros}
 \end{figure}
 
-\subsection{Compensación de Iluminación: CLAHE vs. Ecualización Global}
-La ecualización global de histograma calcula una función de distribución acumulada (CDF) uniforme para toda la imagen. Debido a que el parénquima retiniano posee una enorme masa de píxeles oscuros y semioscuros, la ecualización global satura las regiones centrales brillantes y genera artefactos de ruido masivo en la periferia.
+\textbf{2. Ecualización Adaptativa CLAHE vs. Ecualización Global:}
+Una ecualización global de histograma estira el contraste tomando toda la imagen por igual; como el centro de la retina es brillante y los bordes son oscuros, la ecualización global quema la zona del nervio óptico y mete mucho ruido en la periferia. Por eso aplicamos \textbf{CLAHE}, que trabaja por bloques locales y limita la pendiente máxima (\textit{clip limit} de $2.5$). Así logramos resaltar las venas en las zonas oscuras sin saturar el centro, acompañado de una sustracción de fondo (\textit{Rolling Ball} de $30\text{ px}$) para emparejar la iluminación general.
 
-El algoritmo \textbf{CLAHE} (\textit{Contrast Limited Adaptive Histogram Equalization}) subdivide la imagen en bloques contextuales de $8 \times 8$ píxeles. En cada bloque se ecualiza el histograma localmente pero recortando los picos de frecuencia por encima de un umbral (\textit{clip limit} $= 2.5$). La masa excedente se redistribuye uniformemente y los límites entre bloques se interpolan bilinealmente para evitar discontinuidades de cuadrícula. Esto realza el contraste de capilares de bajísima energía sin amplificar el ruido del fondo.
+\textbf{3. Umbral de Otsu vs. Umbral Manual y Polaridad:}
+El algoritmo de \textbf{Otsu} busca automáticamente el umbral que maximiza la varianza entre dos clases (vasos y fondo), dando un valor exacto de $T = 42$. Al compararlo con un ajuste manual empírico, vimos que bajar el umbral manualmente a $T \approx 30$ permite recuperar algunos microcapilares más, pero mete muchísimo ruido de fondo que ensucia las mediciones; subirlo a $T > 55$ corta las arterias principales en pedazos. Por lo tanto, el umbral de Otsu ($T = 42$) resultó el punto de equilibrio más objetivo y reproducible. Se activó \textit{Dark background} sobre el mapa de vasos realzado para que los vasos queden blancos ($255$) y el fondo negro ($0$).
 
-\subsection{Binarización por Maximización de Varianza de Otsu}
-El algoritmo de Otsu determina el umbral óptimo $T^*$ que maximiza la varianza inter-clase $\sigma_B^2(T)$ entre la clase vascular ($C_1$) y el fondo ($C_0$):
-\begin{equation}
-    \sigma_B^2(T) = \omega_0(T)\omega_1(T) \left[\mu_0(T) - \mu_1(T)\right]^2
-\end{equation}
-Al aplicarse sobre la imagen corregida con sustracción de fondo morfológica, la binarización calcula de forma totalmente determinista un umbral óptimo $T^* = 42.0$. Configurando la polaridad con \textit{Dark Background}, los vasos quedan representados como píxeles de valor 255 (blanco) y el fondo como 0 (negro).
+\textbf{4. Operaciones Morfológicas y Watershed:}
+\begin{itemize}
+    \item \textbf{Apertura (\textit{Open}):} Aplica erosión seguida de dilatación. Nos sirvió para borrar pequeños puntitos blancos aislados y espículas en los bordes que quedaron tras binarizar.
+    \item \textbf{Cierre (\textit{Close}) y Relleno (\textit{Fill Holes}):} Las arterias suelen tener un brillo central que al binarizar deja huecos alargados adentro del vaso. El cierre y relleno sellan esos poros internos para que el vaso sea compacto.
+    \item \textbf{Watershed:} En una red vascular todas las ramas se tocan o cruzan. Al aplicar \textit{Watershed}, Fiji calcula el mapa de distancia al borde y corta los estrechamientos y cruces, separando el árbol vascular en segmentos medibles por separado sin caer en una sobre-segmentación excesiva.
+\end{itemize}
 
-\subsection{Topología Morfológica y Transformada de Watershed}
-Los vasos sanguíneos presentan dos artefactos característicos en la máscara binarizada:
-1. \textbf{Reflejo Arteriolar Central:} La pared elástica arterial refleja luz axial del retinógrafo, generando huecos longitudinales artificiales en el centro del lumen. Para corregirlo, se aplica un cierre morfológico con elemento de disco ($r=2\text{ px}$) seguido de relleno de huecos topológicos (\textit{Binary Fill Holes}):
-\begin{equation}
-    I_{\text{filled}} = \text{Fill}\left((I \oplus B) \ominus B\right)
-\end{equation}
-2. \textbf{Bifurcaciones y Cruces Fusionados:} Las ramas vasculares forman un árbol continuo. Mediante la transformada de distancia euclídea inversa y la detección de líneas divisorias de cuencas hidrográficas (\textit{Watershed}), se insertan crestas de fondo (píxeles 0) que desacoplan los segmentos en componentes morfológicamente independientes para su inspección metrológica individual.
-
+% ==========================================
+% 5. MEMORIA GRÁFICA DE TRANSFORMACIÓN
+% ==========================================
 \section{Memoria Gráfica de Transformación}
 
-\noindent En la Figura~\ref{fig:memoria_grafica} se documenta la evolución pixelar en cada una de las fases críticas del pipeline. Se observa cómo la secuencia orquestada transforma una adquisición no uniforme en una máscara segmentada limpia y una tabla de componentes individuales catalogados numéricamente.
+En la siguiente galería se muestra paso a paso la evolución de la imagen a lo largo de las 5 etapas del pipeline:
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.96\textwidth]{figuras/fig3_memoria_grafica_etapas.png}
+    \caption{Memoria gráfica comparativa de las transformaciones: (a) Imagen Original; (b) Filtrada con Mediana y realzada con CLAHE; (c) Binarizada con Otsu ($T=42$); (d) Morfología binaria (Apertura y Cierre); (e) Separación de ramas con Watershed; (f) Mapa final de contornos numerados.}
+    \label{fig:memoria}
+\end{figure}
+
+% ==========================================
+% 6. CUADRO ESTADÍSTICO Y METROLOGÍA
+% ==========================================
 \section{Cuadro Estadístico y Metrología}
 
-\noindent Concluida la etapa de Análisis de Componentes Conectados (CCA) con exclusión estricta de bordes periféricos (\textit{Exclude on edges}) y supresión de componentes menores a $20\text{ px}^2$, se exportó la base de datos volumétrica a \texttt{results\_metrologia\_retina.csv}. 
+Para la Etapa 5 configuramos \texttt{Analyze Particles} filtrando el ruido residual menor a $20\text{ px}^2$ y marcando \textit{Exclude on edges} para descartar los segmentos que tocan los bordes de corte. Los resultados exportados en el archivo CSV se resumen en la siguiente tabla:
 
 \begin{table}[H]
 \centering
-\small
-\caption{Resumen cuantitativo global de la metrología vascular.}
-\label{tab:metrologia}
-\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}ll@{}}
+\begin{tabular}{@{}lc@{}}
 \toprule
-\textbf{Descriptor Métrico} & \textbf{Valor Medido} \\ \midrule
-Área Útil Fondo de Ojo (FOV) & $311\,605\text{ px}^2$ \\
-Recuento Total de Objetos Válidos ($N$) & \textbf{38 segmentos} \\
-Umbral Óptimo de Otsu ($T^*$) & \textbf{42.00} \\
-Área Vascular Total Segmentada & $101\,901.00\text{ px}^2$ \\
-Área Media por Componente ($\mu_A$) & $2\,681.61\text{ px}^2$ \\
-Mediana de Área & $78.00\text{ px}^2$ \\
-Área Mínima & $22.00\text{ px}^2$ \\
-Área Máxima (Tronco Vascular Principal) & $96\,280.00\text{ px}^2$ \\
-Desviación Estándar de Área ($\sigma_A$) & $15\,594.71\text{ px}^2$ \\
-Circularidad Promedio ($\mu_C$) & \textbf{0.4399} \\
-Circularidad Mediana & \textbf{0.3287} \\
-\textbf{Porcentaje de Ocupación Superficial} & \textbf{32.70\%} \\ \bottomrule
-\end{tabular*}
+\textbf{Métrica / Descriptor Metrológico} & \textbf{Valor Obtenido} \\ \midrule
+Recuento total de objetos válidos ($N$) & \textbf{38 segmentos vasculares} \\
+Área útil del fondo de ojo (FOV de referencia) & $311\,605\text{ px}^2$ \\
+Área total ocupada por vasos sanguíneos & $101\,901.00\text{ px}^2$ \\
+Área media por objeto ($\mu_A$) & $2\,681.61\text{ px}^2$ (Mediana: $78.00\text{ px}^2$) \\
+Área mínima registrada & $22.00\text{ px}^2$ \\
+Área máxima registrada (tronco vascular principal) & $96\,280.00\text{ px}^2$ \\
+Desviación estándar del área ($\sigma_A$) & $15\,594.71\text{ px}^2$ \\
+Circularidad promedio ($C = \frac{4\pi \cdot \text{Área}}{\text{Perímetro}^2}$) & \textbf{0.4399} (Mediana: \textbf{0.3287}) \\
+\textbf{Porcentaje de ocupación superficial vascular} & \textbf{32.70\%} \\ \bottomrule
+\end{tabular}
+\caption{Resumen estadístico de las mediciones obtenidas sobre la retina.}
 \end{table}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\columnwidth]{figuras/fig6_distribucion_metrologica.png}
-    \caption{Distribuciones estadísticas: (a) Histograma de áreas con escala logarítmica (asimetría extrema); (b) Histograma del factor de circularidad $C$.}
-    \label{fig:distribucion}
-\end{figure}
+\textbf{Análisis de los resultados numéricos:}
+Llama la atención que la \textbf{circularidad promedio sea baja ($0.4399$ y mediana de $0.3287$)}. Esto tiene total sentido físico y anatómico: a diferencia de monedas o células redondas (donde $C$ ronda $0.85$ a $1.0$), los vasos sanguíneos son estructuras tubulares largas, finas y ramificadas, lo que hace que tengan muchísimo perímetro en relación a su área. Asimismo, la gran diferencia entre el área media ($2\,681\text{ px}^2$) y la mediana ($78\text{ px}^2$) se debe a que el árbol vascular principal mantiene una estructura grande conectada mientras que las ramificaciones periféricas desacopladas por Watershed son segmentos más cortos.
 
-\subsection{Interpretación Anatómica del Factor de Circularidad}
-El factor de forma o circularidad se define según la ecuación canónica:
-\begin{equation}
-    C = \frac{4\pi \cdot \text{Área}}{\text{Perímetro}^2}
-\end{equation}
-Para un círculo euclídeo perfecto, $C = 1.0$. En estructuras celulares o monedas, $C$ suele ubicarse en $[0.85, 1.00]$. 
-
-En contraposición, en la red vascular de la retina, la morfología dominante es filiforme, ramificada y longitudinal. Esto maximiza el perímetro en relación con el área encerrada, arrojando una circularidad mediana de tan solo $C_{\text{med}} = 0.3287$ y promedio de $C_{\text{prom}} = 0.4399$. Los componentes de mayor calibre y longitud presentan valores de $C < 0.15$, mientras que únicamente los fragmentos terminales pequeños se aproximan a valores de $0.6\text{--}0.7$.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\columnwidth]{figuras/fig5_outlines_etiquetadas.png}
-    \caption{Mapa de contornos (\textit{Outlines}) y numeración de componentes sobre la retina original en alta resolución.}
-    \label{fig:outlines}
-\end{figure}
-
+% ==========================================
+% 7. AUDITORÍA DE ERRORES Y CONCLUSIONES
+% ==========================================
 \section{Auditoría de Errores y Conclusiones}
 
-\subsection{Auditoría Crítica de Sub y Sobre-Segmentación}
+\textbf{Auditoría crítica de errores observados:}
+\begin{enumerate}
+    \item \textbf{Casos de Sub-segmentación (pérdida de capilares finos):} En la zona izquierda e inferior de la retina (donde la iluminación original era más débil), los capilares más finitos tienen un contraste muy bajo. Al aplicar un único umbral global de Otsu ($T=42$) y luego una apertura morfológica, varios de estos microvasos delgados quedan desconectados o por debajo del corte de $20\text{ px}^2$.
+    \item \textbf{Casos de Sobre-segmentación y artefactos:} En la zona brillante del disco óptico (derecha) y en algunas bifurcaciones anchas, el algoritmo de \textit{Watershed} (pensado originalmente para objetos convexos o circulares como células) genera cortes transversales artificiales sobre venas que en realidad son un mismo conducto continuo.
+\end{enumerate}
+
+\textbf{Propuestas de optimización:}
 \begin{itemize}
-    \item \textbf{Sub-segmentación en Periferia (Penumbra):} En los cuadrantes temporales extremos, el viñeteado óptico atenúa la reflexión de los microcapilares de orden terminal ($< 1\text{ px}$). A pesar del uso de CLAHE, el umbral global de Otsu ($T=42.0$) tiende a desconectar estas estructuras muy finas.
-    \item \textbf{Sobre-segmentación en el Disco Óptico:} La emergencia de la arteria y vena central de la retina sobre la papila óptica se caracteriza por una alta reflectancia brillante del fondo. Esto ocasiona que la pared externa del vaso sobre la excavación papilar presente variaciones locales de gradiente, requiriendo el desacople de Watershed para evitar que se interprete como una sola macro-masa indiferenciada.
+    \item \textbf{Umbralización Local Adaptativa (Phansalkar o Bernsen):} En lugar de usar Otsu global, usar \texttt{Image > Adjust > Auto Local Threshold} en Fiji permitiría adaptarse mejor a los microvasos en regiones oscuras sin engrosar las venas del centro.
+    \item \textbf{Filtros Tubulares (Frangi Vesselness / Tubeness):} Fiji incluye el plugin \texttt{Plugins > Analyze > Tubeness}, que detecta específicamente formas cilíndricas o lineales antes de binarizar, evitando que se corten los capilares finos y reemplazando el uso de Watershed por un análisis de esqueleto (\texttt{Skeletonize}).
 \end{itemize}
 
-\subsection{Propuestas de Optimización Avanzada}
-Como propuesta superadora para pipelines de producción clínica, se recomienda integrar un filtro multiescala basado en el tensor Hessiano (\textit{Frangi Vesselness Filter}):
-\begin{equation}
-    \mathcal{H} = \begin{bmatrix} I_{xx} & I_{xy} \\ I_{yx} & I_{yy} \end{bmatrix}
-\end{equation}
-El análisis de los autovalores de $\mathcal{H}$ ($\lambda_1 \approx 0$, $|\lambda_2| \gg 0$) permite discriminar invariablemente estructuras tubulares independientemente del gradiente de iluminación de fondo, superando la limitación de la umbralización puramente fotométrica.
-
-\subsection{Conclusiones}
-El pipeline implementado demostró un desempeño sólido y consistente para el aislamiento, binarización y caracterización cuantitativa de la vasculatura retiniana en el caso \texttt{Img 3}. La combinación de aislamiento en el canal verde, filtrado de mediana ($3\times 3$), ecualización CLAHE, umbralización de Otsu y acondicionamiento morfológico permitió cuantificar con precisión un $32.70\%$ de vascularización retiniana y caracterizar formalmente la geometría de 38 componentes vasculares independientes.
-
-\vspace{0.2cm}
-\small
-\begin{thebibliography}{9}
-\bibitem{otsu1979} N. Otsu, ``A threshold selection method from gray-level histograms,'' \textit{IEEE Trans. Syst., Man, Cybern.}, vol. 9, no. 1, pp. 62--66, 1979.
-\bibitem{gonzalez2018} R. C. Gonzalez and R. E. Woods, \textit{Digital Image Processing}, 4th ed., Pearson, 2018.
-\bibitem{zuiderveld1994} K. Zuiderveld, ``Contrast limited adaptive histogram equalization,'' \textit{Graphics Gems IV}, Academic Press, pp. 474--485, 1994.
-\bibitem{frangi1998} A. F. Frangi et al., ``Multiscale vessel enhancement filtering,'' \textit{MICCAI}, Springer, pp. 130--137, 1998.
-\end{thebibliography}
+\textbf{Conclusión:}
+El pipeline desarrollado en 5 etapas permitió acondicionar con éxito una imagen médica compleja con iluminación despareja y bajo contraste local. La combinación del canal verde, el filtro de Mediana ($3\times 3$) y el realce CLAHE fue clave para que la segmentación de Otsu y la morfología binaria lograran aislar la red vascular, determinando una ocupación superficial del $32.70\%$ y verificando cuantitativamente su geometría alargada mediante el descriptor de circularidad.
 
 \end{document}
