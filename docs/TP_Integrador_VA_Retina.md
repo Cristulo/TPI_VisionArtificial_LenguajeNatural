@@ -1,10 +1,14 @@
-# Trabajo Práctico Integrador: Visión Artificial
+# Licenciatura en Inteligencia Artificial
 
-- **Carrera:** Licenciatura en Inteligencia Artificial
-- **Materia:** 2026-1IA1(1) Visión Artificial y Lenguaje Natural
-- **Profesores:**
-  - [Martín Gustavo Casatti](https://uv.frc.utn.edu.ar/user/profile.php?id=78067)
-  - [Sebastián Federico Oliva](https://uv.frc.utn.edu.ar/user/profile.php?id=18813)
+**Materia:** 2026-1IA1(1) Visión Artificial y Lenguaje Natural  
+**Profesores:**
+- [Martín Gustavo Casatti](https://uv.frc.utn.edu.ar/user/profile.php?id=78067)
+- [Sebastián Federico Oliva](https://uv.frc.utn.edu.ar/user/profile.php?id=18813)
+
+---
+
+# Trabajo Práctico Integrador: Visión Artificial
+## Pipeline de Procesamiento y Metrología en Retinografía Vascular Digital
 
 ---
 
@@ -12,7 +16,7 @@
 
 - **Título del Trabajo:** Pipeline de Procesamiento y Metrología en Retinografía Vascular Digital
 - **Caso Seleccionado:** Imagen 3 – Retinografía Vascular Digital (Recurso: `Retina` / `3.png`)
-- **Herramienta Utilizada:** ImageJ (Interfaz Gráfica No-Code)
+- **Herramienta Utilizada:** ImageJ.js (Versión Online Web No-Code)
 - **Integrantes del Grupo:**
   - **Bringas, Mateo Lautaro** - Legajo: 435719
   - **Castro, Cristian Leonel** - Legajo: 435837
