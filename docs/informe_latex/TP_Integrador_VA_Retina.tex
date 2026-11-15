@@ -55,9 +55,9 @@
         \vspace{0.3cm}
         \textbf{Integrantes del Grupo:}
         \begin{itemize}
-            \item \textbf{Bringas, Mateo Lautaro} -- Legajo: 435719
-            \item \textbf{Castro, Cristian Leonel} -- Legajo: 435837
-            \item \textbf{Garcia Pintos, Valentín} -- Legajo: 435804
+            \item \textbf{Bringas, Mateo Lautaro} -- Legajo: 435719 \\ \texttt{Mateobringas6@gmail.com}
+            \item \textbf{Castro, Cristian Leonel} -- Legajo: 435837 \\ \texttt{CristianCastroContactos@gmail.com}
+            \item \textbf{Garcia Pintos, Valentín} -- Legajo: 435804 \\ \texttt{valgpintos@gmail.com}
         \end{itemize}
     \end{minipage}
 
@@ -73,7 +73,7 @@
 % ==========================================
 \section{Diagnóstico Fotométrico y de Adquisición}
 
-Para comenzar el trabajo en Fiji/ImageJ, abrimos la imagen \texttt{3.png} ($1024 \times 680$ píxeles). Al tratarse de una imagen a color (RGB) de fondo de ojo, el primer paso antes de pasar a 8 bits fue evaluar los canales por separado mediante \texttt{Image > Color > Split Channels}. 
+Para comenzar el trabajo en ImageJ.js, abrimos la imagen \texttt{3.png} ($1024 \times 680$ píxeles). Al tratarse de una imagen a color (RGB) de fondo de ojo, el primer paso antes de pasar a 8 bits fue evaluar los canales por separado mediante \texttt{Image > Color > Split Channels}. 
 
 Observamos que el canal Rojo está muy saturado (los vasos casi no se distinguen del tejido) y el canal Azul es demasiado oscuro y ruidoso. En cambio, el \textbf{Canal Verde (G)} muestra el mejor contraste porque la sangre absorbe mucha luz en esa longitud de onda, haciendo que las venas y arterias se vean bien oscuras respecto al fondo de la retina. Por eso nos quedamos con el canal verde como imagen monocromática de 8 bits (valores discretos en $[0, 255]$).
 
@@ -96,7 +96,7 @@ Observamos que el canal Rojo está muy saturado (los vasos casi no se distinguen
 % ==========================================
 \section{Diagrama de Flujo del Pipeline}
 
-A continuación se presenta el esquema en bloques de las 5 etapas ejecutadas y la tabla con las herramientas y parámetros exactos utilizados en Fiji/ImageJ:
+A continuación se presenta el esquema en bloques de las 5 etapas ejecutadas y la tabla con las herramientas y parámetros exactos utilizados en ImageJ.js:
 
 \begin{figure}[H]
     \centering
@@ -110,11 +110,11 @@ A continuación se presenta el esquema en bloques de las 5 etapas ejecutadas y l
 \footnotesize
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llll@{}}
 \toprule
-\textbf{Etapa} & \textbf{Operación} & \textbf{Ruta en Fiji / ImageJ} & \textbf{Parámetros Exactos} \\ \midrule
+\textbf{Etapa} & \textbf{Operación} & \textbf{Ruta en ImageJ.js} & \textbf{Parámetros Exactos} \\ \midrule
 1. Ingesta & Canal Verde 8-bit & \texttt{Image > Color > Split Channels} & Selección canal G ($[0, 255]$) \\
            & Histograma & \texttt{Analyze > Histogram} & 256 bins (Región FOV) \\
 2. Preproceso & Filtro Espacial & \texttt{Process > Filters > Median...} & Radio $= 1.5\text{ px}$ (Kernel $3\times 3$) \\
-              & Realce Local & \texttt{Process > Enhance Local Contrast} & Block=63, Bins=256, Slope=2.5 \\
+              & Realce Local & \texttt{Plugins > Enhance Local Contrast (CLAHE)} & Block=63, Bins=256, Slope=2.5 \\
               & Sustracción Fondo & \texttt{Process > Subtract Background} & Rolling ball $= 30\text{ px}$ \\
 3. Segmentación & Umbralización & \texttt{Image > Adjust > Threshold} & \textbf{Otsu} ($T = 42$), \textit{Dark bg} \\
 4. Morfología & Apertura Binaria & \texttt{Process > Binary > Open} & Disco $r=1\text{ px}$ ($3\times 3$) \\
@@ -159,7 +159,7 @@ La etapa de segmentación y binarización es decisiva, ya que establece la front
 \begin{itemize}
     \item \textbf{Apertura (\textit{Open}):} Aplica erosión seguida de dilatación. Nos sirvió para borrar pequeños puntitos blancos aislados y espículas en los bordes que quedaron tras binarizar.
     \item \textbf{Cierre (\textit{Close}) y Relleno (\textit{Fill Holes}):} Las arterias suelen tener un brillo central que al binarizar deja huecos alargados adentro del vaso. El cierre y relleno sellan esos poros internos para que el vaso sea compacto.
-    \item \textbf{Watershed:} En una red vascular todas las ramas se tocan o cruzan. Al aplicar \textit{Watershed}, Fiji calcula el mapa de distancia al borde y corta los estrechamientos y cruces, separando el árbol vascular en segmentos medibles por separado sin caer en una sobre-segmentación excesiva.
+    \item \textbf{Watershed:} En una red vascular todas las ramas se tocan o cruzan. Al aplicar \textit{Watershed}, ImageJ.js calcula el mapa de distancia al borde y corta los estrechamientos y cruces, separando el árbol vascular en segmentos medibles por separado sin caer en una sobre-segmentación excesiva.
 \end{itemize}
 
 % ==========================================
@@ -217,8 +217,8 @@ Llama la atención que la \textbf{circularidad promedio sea baja ($0.4399$ y med
 
 \textbf{Propuestas de optimización:}
 \begin{itemize}
-    \item \textbf{Umbralización Local Adaptativa (Phansalkar o Bernsen):} En lugar de usar Otsu global, usar \texttt{Image > Adjust > Auto Local Threshold} en Fiji permitiría adaptarse mejor a los microvasos en regiones oscuras sin engrosar las venas del centro.
-    \item \textbf{Filtros Tubulares (Frangi Vesselness / Tubeness):} Fiji incluye el plugin \texttt{Plugins > Analyze > Tubeness}, que detecta específicamente formas cilíndricas o lineales antes de binarizar, evitando que se corten los capilares finos y reemplazando el uso de Watershed por un análisis de esqueleto (\texttt{Skeletonize}).
+    \item \textbf{Umbralización Local Adaptativa (Phansalkar o Bernsen):} En lugar de usar Otsu global, usar \texttt{Image > Adjust > Auto Local Threshold} en Fiji (Desktop) permitiría adaptarse mejor a los microvasos en regiones oscuras sin engrosar las venas del centro.
+    \item \textbf{Filtros Tubulares (Frangi Vesselness / Tubeness):} La versión Fiji (Desktop) incluye el plugin \texttt{Plugins > Analyze > Tubeness}, que detecta específicamente formas cilíndricas o lineales antes de binarizar, evitando que se corten los capilares finos y reemplazando el uso de Watershed por un análisis de esqueleto (\texttt{Skeletonize}).
 \end{itemize}
 
 \textbf{Conclusión:}

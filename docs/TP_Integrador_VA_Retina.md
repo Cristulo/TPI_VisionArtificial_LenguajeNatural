@@ -2,7 +2,8 @@
 
 # Licenciatura en Inteligencia Artificial
 
-**Materia:** 2026-1IA1(1) Visión Artificial y Lenguaje Natural**Profesores:**
+**Materia:** 2026-1IA1(1) Visión Artificial y Lenguaje Natural  
+**Profesores:**
 
 * [Martín Gustavo Casatti](https://uv.frc.utn.edu.ar/user/profile.php?id=78067)
 * [Sebastián Federico Oliva](https://uv.frc.utn.edu.ar/user/profile.php?id=18813)
@@ -21,15 +22,18 @@
 * **Caso Seleccionado:** Imagen 3 – Retinografía Vascular Digital (Recurso: `Retina` / `3.png`)
 * **Herramienta Utilizada:** ImageJ.js (Versión Online Web No-Code)
 * **Integrantes del Grupo:**
-    * **Bringas, Mateo Lautaro** - Legajo: 435719
-    * **Castro, Cristian Leonel** - Legajo: 435837
-    * **Garcia Pintos, Valentín** - Legajo: 435804
+    * **Bringas, Mateo Lautaro** - Legajo: 435719  
+      `Mateobringas6@gmail.com`
+    * **Castro, Cristian Leonel** - Legajo: 435837  
+      `CristianCastroContactos@gmail.com`
+    * **Garcia Pintos, Valentín** - Legajo: 435804  
+      `valgpintos@gmail.com`
 
 ---
 
 ## 2. Diagnóstico Fotométrico y de Adquisición
 
-Para comenzar el trabajo en Fiji/ImageJ, abrimos la imagen `3.png` (1024 × 680 píxeles). Al tratarse de una imagen a color (RGB) de fondo de ojo, el primer paso antes de pasar a 8 bits fue evaluar los canales por separado mediante `Image > Color > Split Channels`.
+Para comenzar el trabajo en ImageJ.js, abrimos la imagen `3.png` (1024 × 680 píxeles). Al tratarse de una imagen a color (RGB) de fondo de ojo, el primer paso antes de pasar a 8 bits fue evaluar los canales por separado mediante `Image > Color > Split Channels`.
 
 Observamos que el canal Rojo está muy saturado (los vasos casi no se distinguen del tejido) y el canal Azul es demasiado oscuro y ruidoso. En cambio, el **Canal Verde (G)** muestra el mejor contraste porque la sangre absorbe mucha luz en esa longitud de onda, haciendo que las venas y arterias se vean bien oscuras respecto al fondo de la retina. Por eso nos quedamos con el canal verde como imagen monocromática de 8 bits (valores discretos en `[0, 255]`).
 
@@ -57,12 +61,12 @@ El pipeline de procesamiento se organiza en 5 etapas consecutivas ejecutadas ín
 1. **Etapa 4 — Acondicionamiento Morfológico y Separación:** Apertura binaria (`Binary > Open`, disco r = 1 px) para limpiar ruido aislado → Cierre y relleno de huecos (`Close` + `Fill Holes`, r = 2 px) para sellar el reflejo central de las arterias → Separación de bifurcaciones y cruces con `Binary > Watershed`.
 1. **Etapa 5 — Extracción Metrológica (CCA):** Configuración de descriptores geométricos (`Set Measurements`: Area, Centroid, Perimeter, Shape Descriptors) → Conteo y medición de componentes (`Analyze Particles`: Size `20-Infinity`, *Exclude on edges*, Show `Outlines`) → Exportación de tabla `Results.csv`.
 
-| Etapa | Operación | Ruta en Fiji / ImageJ | Parámetros Exactos | 
+| Etapa | Operación | Ruta en ImageJ.js | Parámetros Exactos | 
 | --- | --- | --- | --- | 
 | 1. Ingesta | Canal Verde 8-bit | Image > Color > Split Channels | Selección canal G ([0, 255]) | 
 | 1. Ingesta | Histograma | Analyze > Histogram | 256 bins (Región FOV) | 
 | 2. Preprocesamiento | Filtro Espacial | Process > Filters > Median... | Radio = 1.5 px (Kernel 3 × 3) | 
-| 2. Preprocesamiento | Realce Local (CLAHE) | Process > Enhance Local Contrast | Blocksize=63, Bins=256, Slope=2.5 | 
+| 2. Preprocesamiento | Realce Local (CLAHE) | Plugins > Enhance Local Contrast (CLAHE) | Blocksize=63, Bins=256, Slope=2.5 | 
 | 2. Preprocesamiento | Sustracción de Fondo | Process > Subtract Background | Rolling ball radius = 30 px | 
 | 3. Segmentación | Umbralización | Image > Adjust > Threshold | Método: Otsu (T = 42), Dark background | 
 | 4. Morfología | Apertura Binaria | Process > Binary > Open | Elemento estructurante 3 × 3 (disco r=1) | 
@@ -117,7 +121,7 @@ La etapa de segmentación y binarización es crítica, ya que define la frontera
 
 * **Apertura (*****Open*****):** Aplica erosión seguida de dilatación. Nos sirvió para borrar pequeños puntitos blancos aislados y espículas en los bordes que quedaron tras binarizar.
 * **Cierre (*****Close*****) y Relleno (*****Fill Holes*****):** Las arterias suelen tener un brillo central que al binarizar deja huecos alargados adentro del vaso. El cierre y relleno sellan esos poros internos para que el vaso sea compacto.
-* **Watershed:** En una red vascular todas las ramas se tocan o cruzan. Al aplicar *Watershed*, Fiji calcula el mapa de distancia al borde y corta los estrechamientos y cruces, separando el árbol vascular en segmentos medibles por separado sin caer en una sobre-segmentación excesiva.
+* **Watershed:** En una red vascular todas las ramas se tocan o cruzan. Al aplicar *Watershed*, ImageJ.js calcula el mapa de distancia al borde y corta los estrechamientos y cruces, separando el árbol vascular en segmentos medibles por separado sin caer en una sobre-segmentación excesiva.
 
 ---
 
@@ -166,8 +170,8 @@ https://docs.google.com/docs-images-rt/AIpPl2D2GKgFcXDhDNaODW_a115dtQNQyVUmZOmoT
 
 ### Propuestas de optimización
 
-* **Umbralización Local Adaptativa (Phansalkar o Bernsen):** En lugar de usar Otsu global, usar `Image > Adjust > Auto Local Threshold` en Fiji permitiría adaptarse mejor a los microvasos en regiones oscuras sin engrosar las venas del centro.
-* **Filtros Tubulares (Frangi Vesselness / Tubeness):** Fiji incluye el plugin `Plugins > Analyze > Tubeness`, que detecta específicamente formas cilíndricas o lineales antes de binarizar, evitando que se corten los capilares finos y reemplazando el uso de Watershed por un análisis de esqueleto (`Skeletonize`).
+* **Umbralización Local Adaptativa (Phansalkar o Bernsen):** En lugar de usar Otsu global, usar `Image > Adjust > Auto Local Threshold` en Fiji (Desktop) permitiría adaptarse mejor a los microvasos en regiones oscuras sin engrosar las venas del centro.
+* **Filtros Tubulares (Frangi Vesselness / Tubeness):** La versión Fiji (Desktop) incluye el plugin `Plugins > Analyze > Tubeness`, que detecta específicamente formas cilíndricas o lineales antes de binarizar, evitando que se corten los capilares finos y reemplazando el uso de Watershed por un análisis de esqueleto (`Skeletonize`).
 
 ### Conclusión
 
