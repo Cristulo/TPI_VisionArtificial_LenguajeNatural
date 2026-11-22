@@ -165,6 +165,7 @@ https://docs.google.com/docs-images-rt/AIpPl2D2GKgFcXDhDNaODW_a115dtQNQyVUmZOmoT
 
 ### Auditoría crítica de errores observados
 
+1. **Contraste entre conteo visual y automático:** Visualmente, la red vascular de la retina conforma una estructura arbórea continua originada en el disco óptico. El conteo automático arrojó `N = 38` segmentos válidos debido a que las ramas periféricas de bajo contraste se desconectan tras la umbralización y a que *Watershed* divide el tronco principal en múltiples fragmentos medibles.
 1. **Casos de Sub-segmentación (pérdida de capilares finos):** En la zona izquierda e inferior de la retina (donde la iluminación original era más débil), los capilares más finitos tienen un contraste muy bajo. Al aplicar un único umbral global de Otsu (T = 42) y luego una apertura morfológica, varios de estos microvasos delgados quedan desconectados o por debajo del corte de 20 px².
 1. **Casos de Sobre-segmentación y artefactos:** En la zona brillante del disco óptico (derecha) y en algunas bifurcaciones anchas, el algoritmo de *Watershed* (pensado originalmente para objetos convexos o circulares como células) genera cortes transversales artificiales sobre venas que en realidad son un mismo conducto continuo.
 
