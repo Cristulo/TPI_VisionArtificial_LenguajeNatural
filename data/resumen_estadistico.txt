@@ -1,0 +1,15 @@
+TPI Visión Artificial - Retinografía Vascular Digital (3.png)
+Autores: Bringas, Mateo Lautaro (435719) | Castro, Cristian Leonel (435837) | Garcia Pintos, Valentin (435804)
+
+Área FOV Fondo de Ojo: 311605 px^2
+Recuento Componentes Válidos: 38
+Umbral de Otsu Calculado: 42.00
+Área Vascular Total: 101901.00 px^2
+Área Media: 2681.61 px^2
+Área Mediana: 78.00 px^2
+Área Mínima: 22.00 px^2
+Área Máxima: 96280.00 px^2
+Desviación Estándar Área: 15594.71 px^2
+Circularidad Promedio: 0.4399
+Circularidad Mediana: 0.3287
+Porcentaje Ocupación Superficial: 32.70%
